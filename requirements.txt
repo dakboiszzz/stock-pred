@@ -4,4 +4,4 @@ numpy
 matplotlib
 vnstock
 scikit-learn
-
+matplotlib

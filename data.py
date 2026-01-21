@@ -1,10 +1,7 @@
 import numpy as np 
 import pandas as pd
-import torch
-import torch.nn as nn
 import matplotlib.pyplot as plt
 from sklearn.preprocessing import MinMaxScaler
-from torch.utils.data import DataLoader, TensorDataset
 from vnstock import Quote
 
 def create_windows(X_data, y_data, n_steps=60):
@@ -14,7 +11,18 @@ def create_windows(X_data, y_data, n_steps=60):
         y.append(y_data[i + n_steps])
     return np.array(X), np.array(y)
 
-def getData(symbol, start_date, end_date,split_ratio = 0.8, ):
+def getData(symbol = 'MBB', start_date = '2019-01-01', end_date = '2026-01-14',split_ratio = 0.8):
+    """Function for getting the data from vnstock API
+
+    Args:
+        symbol (str): The ticker of the company
+        start_date (str): The start date
+        end_date (str): The end date
+        split_ratio (float, optional): Train-test split ratio. Defaults to 0.8.
+
+    Returns:
+        X_train,y_train,X_test,y_test (np.array): Train and Test data
+    """
     # Get the data from vnstock
     quote = Quote(symbol=symbol, source='VCI')
     df = quote.history(start=start_date, end=end_date, interval='1D')
@@ -42,12 +50,4 @@ def getData(symbol, start_date, end_date,split_ratio = 0.8, ):
     X_test, y_test = create_windows(test_scaled_X, test_scaled_y)
     
 
-    # Convert to PyTorch Tensors
-    X_train_t = torch.tensor(X_train, dtype=torch.float32)
-    y_train_t = torch.tensor(y_train, dtype=torch.float32)
-    X_test_t = torch.tensor(X_test, dtype=torch.float32)
-    y_test_t = torch.tensor(y_test, dtype=torch.float32)
-
-    train_loader = DataLoader(TensorDataset(X_train_t, y_train_t), batch_size=32, shuffle=True)
-    
-    return train_loader, X_test_t, y_test_t
+    return X_train,y_train,X_test,y_test
